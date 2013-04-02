@@ -37,6 +37,8 @@ task :publish_build do
   require 'date'
   require 'aws-sdk'
   rev=`git rev-list HEAD -n 1`.to_s.strip
+  master_rev = `git rev-list origin/master -n 1`.to_s.strip
+  return unless rev == master_rev
   s3 = AWS::S3.new(
     :access_key_id => ENV['S3_ACCESS_KEY_ID'],
     :secret_access_key => ENV['S3_SECRET_ACCESS_KEY']
