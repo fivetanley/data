@@ -55,5 +55,6 @@ task :publish_build do
   ember_data_latest.write data_path
   ember_data_latest_min.write min_path
   ember_data_min.write min_path
+  puts "Published ember-data for #{rev}"
 end
 
