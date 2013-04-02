@@ -32,3 +32,17 @@ task :clean => "ember:clean"
 task :dist => "ember:dist"
 task :test, [:suite] => "ember:test"
 task :default => :dist
+
+task :publish_build do
+  require 'date'
+  require 'aws-sdk'
+  s3 = AWS::S3.new(
+    :access_key_id => ENV['S3_ACCESS_KEY_ID'],
+    :secret_access_key => ENV['S3_SECRET_ACCESS_KEY']
+  )
+  bucket = s3.buckets["#{ENV['S3_BUCKET_NAME']}"]
+  now = Time.now.strftime('%Y-%m-%d_%M')
+  ember_data_prod = bucket.objects["ember.js-development-#{now}.js"]
+  ember_data_prod.write File.expand_path File.dirname(__FILE__) + '/dist/ember.js'
+end
+
