@@ -36,17 +36,22 @@ task :default => :dist
 task :publish_build do
   require 'date'
   require 'aws-sdk'
+  rev=`git rev-list HEAD -n 1`.to_s.strip
   s3 = AWS::S3.new(
     :access_key_id => ENV['S3_ACCESS_KEY_ID'],
     :secret_access_key => ENV['S3_SECRET_ACCESS_KEY']
   )
   bucket = s3.buckets["#{ENV['S3_BUCKET_NAME']}"]
-  now = Time.now.strftime('%Y-%m-%d_%M')
-  ember_data_dev = bucket.objects["ember-data-development-#{now}.js"]
-  ember_data_min = bucket.objects["ember-data-#{now}.min.js"]
-  ember_data_dev.write Pathname.new File.expand_path File.dirname(__FILE__)+
-    '/dist/ember-data.js'
-  ember_data_min.write Pathname.new File.expand_path File.dirname(__FILE__)+
-    '/dist/ember-data-min.js'
+  ember_data_latest = bucket.objects['ember-data-latest.js']
+  ember_data_latest_min = bucket.objects['ember-data-latest.min.js']
+  ember_data_dev = bucket.objects["ember-data-#{rev}.js"]
+  ember_data_min = bucket.objects["ember-data-#{rev}.min.js"]
+  dist = File.dirname(__FILE__) + '/dist/'
+  data_path = Pathname.new dist + 'ember-data.js'
+  min_path = Pathname.new dist + 'ember-data.min.js'
+  ember_data_dev.write data_path
+  ember_data_latest.write data_path
+  ember_data_latest_min.write min_path
+  ember_data_min.write min_path
 end
 
