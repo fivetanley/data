@@ -44,9 +44,9 @@ task :publish_build do
   now = Time.now.strftime('%Y-%m-%d_%M')
   ember_data_dev = bucket.objects["ember-data-development-#{now}.js"]
   ember_data_min = bucket.objects["ember-data-#{now}.min.js"]
-  ember_data_dev.write File.expand_path File.dirname(__FILE__)+
+  ember_data_dev.write Pathname.new File.expand_path File.dirname(__FILE__)+
     '/dist/ember-data.js'
-  ember_data_min.write File.expand_path File.dirname(__FILE__)+
+  ember_data_min.write Pathname.new File.expand_path File.dirname(__FILE__)+
     '/dist/ember-data-min.js'
 end
 
