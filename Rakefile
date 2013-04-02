@@ -42,7 +42,11 @@ task :publish_build do
   )
   bucket = s3.buckets["#{ENV['S3_BUCKET_NAME']}"]
   now = Time.now.strftime('%Y-%m-%d_%M')
-  ember_data_prod = bucket.objects["ember.js-development-#{now}.js"]
-  ember_data_prod.write File.expand_path File.dirname(__FILE__) + '/dist/ember.js'
+  ember_data_dev = bucket.objects["ember-data-development-#{now}.js"]
+  ember_data_min = bucket.objects["ember-data-#{now}.min.js"]
+  ember_data_dev.write File.expand_path File.dirname(__FILE__)+
+    '/dist/ember-data.js'
+  ember_data_min.write File.expand_path File.dirname(__FILE__)+
+    '/dist/ember-data-min.js'
 end
 
