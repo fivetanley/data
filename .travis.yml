@@ -7,7 +7,7 @@ before_script:
 - sh -e /etc/init.d/xvfb start
 - rake clean
 script: rake test[all]
-after_failure: rake publish_build
+after_failure: 'rake publish_build'
 notifications:
   webhooks: http://emberjs-master-builds.herokuapp.com/upload/data
 env:
