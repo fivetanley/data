@@ -11,10 +11,14 @@ var BROWSERS = [
 
 console.log(process.env.SAUCE_USERNAME)
 
+var host = process.env.TEST_HOST;
+var root = process.env.TEST_ROOT;
+var file = process.env.TEST_FILE;
+
 var runner = new TestRunner({
   username: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
-  urls: ['http://builds.emberjs.com/lolfivetanley/saucelabs.html'],
+  urls: ['http://' + host + '/' + root + '/' + file ]
   browsers: BROWSERS
 }, 'qunit', function(){});
 
