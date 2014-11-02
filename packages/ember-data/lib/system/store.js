@@ -81,14 +81,6 @@ function coerceId(id) {
   });
   ```
 
-  If your application has multiple `DS.Store` instances (an unusual case), you can
-  specify which store should be used:
-
-  ```javascript
-  store.find('person', 123).then(function (person) {
-  });
-  ```
-
   By default, the store will talk to your backend using a standard
   REST mechanism. You can customize how the store talks to your
   backend by specifying a custom adapter:
@@ -1294,8 +1286,8 @@ Store = Ember.Object.extend({
     // _partial is an internal param used by `update`.
     // If passed, it means that the data should be
     // merged into the existing data, not replace it.
-    Ember.assert("Expected an object as `data` in a call to push for " + typeName + " , but was " + data, Ember.typeOf(data) === 'object');
-    Ember.assert("You must include an `id` for " + typeName + " in an object passed to `push`", data.id != null);
+    Ember.assert("Expected an object as `data` in a call to `push`/`update` for " + typeName + " , but was " + data, Ember.typeOf(data) === 'object');
+    Ember.assert("You must include an `id` for " + typeName + " in an object passed to `push`/`update`", data.id != null && data.id !== '');
 
     var type = this.modelFor(typeName);
 
@@ -1436,8 +1428,6 @@ Store = Ember.Object.extend({
     @return {DS.Model} the record that was updated.
   */
   update: function(type, data) {
-    Ember.assert("You must include an `id` for " + type + " in a hash passed to `update`", data.id != null);
-
     return this.push(type, data, true);
   },
 

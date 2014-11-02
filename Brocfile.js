@@ -16,6 +16,7 @@ var renderTemplate = require('broccoli-render-template');
 var yuidoc = require('broccoli-yuidoc');
 var replace = require('broccoli-string-replace');
 var assetrev = require('broccoli-asset-rev');
+var derequire = require('broccoli-derequire');
 
 function moveFromLibAndMainJS(packageName, vendored){
   var root = vendored ? 'bower_components/' + packageName + "/packages/" + packageName + '/lib':
@@ -205,24 +206,25 @@ testHTML = moveFile(testHTML, {
 
 testFiles = merge([testFiles, testHTML], {overwrite: true});
 
-var trees = merge([
+var trees = [
   testFiles,
-  globalBuild,
   namedAMDBuild,
   testRunner,
   bower,
   configurationFiles
-]);
+];
 
 if (env === 'production') {
+  globalBuild = derequire(globalBuild);
+
   var minifiedAMD = minify(namedAMDBuild, 'ember-data.named-amd');
   var minifiedGlobals = minify(globalBuild, 'ember-data');
-  trees = merge([
-    yuidocTree,
-    trees,
-    minifiedAMD,
-    minifiedGlobals
-  ]);
+
+  trees.push(yuidocTree);
+  trees.push(minifiedAMD);
+  trees.push(minifiedGlobals);
 }
 
-module.exports = trees;
+trees.push(globalBuild);
+
+module.exports = merge(trees);
