@@ -54,6 +54,7 @@
     "ember-publisher": "0.0.6",
     "git-repo-version": "0.0.2",
     "grunt-saucelabs": "^8.3.2",
+    "request": "^2.47.0",
     "testem": "^0.6.19",
     "yuidocjs": "~0.3.46"
   }
