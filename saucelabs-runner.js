@@ -27,4 +27,5 @@ runner.runTests().then(done).
   console.log('done');
 }, function(err){
   console.log('err', err);
+  process.exit(1);
 });
