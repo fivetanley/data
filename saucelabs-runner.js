@@ -9,16 +9,17 @@ var BROWSERS = [
   }
 ];
 
-console.log(process.env.SAUCE_USERNAME)
+console.log(process.env.SAUCE_USERNAME);
 
 var host = process.env.TEST_HOST;
 var root = process.env.TEST_ROOT;
 var file = process.env.TEST_FILE;
+var url = 'http://' + host + '/' + root + '/' + file;
 
 var runner = new TestRunner({
   username: process.env.SAUCE_USERNAME,
   key: process.env.SAUCE_ACCESS_KEY,
-  urls: ['http://' + host + '/' + root + '/' + file ]
+  urls: [url],
   browsers: BROWSERS
 }, 'qunit', function(){});
 
