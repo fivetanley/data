@@ -16,12 +16,66 @@ import {
 import addEmberAssertions from 'dummy/tests/helpers/ember-assertions';
 import Ember from 'ember';
 
+const StackTrace = window.stacktraceJs;
+
+const log = QUnit.log.bind(QUnit);
 
 setResolver(resolver);
+
+const runLoggingCallbacks = (key, args) => {
+  const callbacks = QUnit.config.callbacks[key];
+
+  for(let i = 0, length = callbacks.length; i < length; i++) {
+    callbacks[i](args);
+  }
+};
 
 const ENV = Ember.ENV;
 const QUNIT_PARAMS = QUnit.urlParams;
 const { assert } = QUnit;
+
+const { ok } = assert;
+
+assert.ok = function okWithStack(result, message) {
+  let done = this.async();
+  this.test.push = function pushWithSourceMap(result, actual, expected, message) {
+    let source;
+
+    const details = {
+      module: this.module.name,
+      name: this.testName,
+      result: result,
+      message: message,
+      actual: actual,
+      testId: this.testId,
+      runtime: Date.now() - this.started
+    };
+
+    if (!result) {
+      return StackTrace.get({
+      }).then((stackframes) => {
+        const withoutQUnit = stackframes.filter(stackframe => !/qunit/.test(stackframe.getFileName()));
+        details.source = withoutQUnit.map(frame => frame.toString()).join('\n');
+        runLoggingCallbacks('log', details);
+        this.assertions.push({
+          result: !!result,
+          message: message
+        });
+        done();
+      }).catch((err) => {
+        debugger;
+        done();
+      });;
+    } else {
+      this.assertions.push({
+        result: !!result,
+        message: message
+      });
+      done();
+    }
+  };
+  return ok.apply(this, arguments);
+};
 
 ENV.EXTEND_PROTOTYPES = QUNIT_PARAMS.extendprototypes;
 ENV.ENABLE_OPTIONAL_FEATURES = QUNIT_PARAMS.enableoptionalfeatures;

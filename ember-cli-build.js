@@ -4,6 +4,7 @@ var EmberApp = require('ember-cli/lib/broccoli/ember-addon');
 var merge    = require('broccoli-merge-trees');
 var globals  = require('./lib/globals');
 var yuidoc   = require('./lib/yuidoc');
+var path     = require('path');
 
 module.exports = function(defaults) {
   var app = new EmberApp(defaults, {
@@ -13,6 +14,7 @@ module.exports = function(defaults) {
     }
     // Add options here
   });
+  app.import('vendor/stacktrace/stacktrace.js');
 
   /*
     This build file specifes the options for the dummy test app of this
