@@ -103,6 +103,70 @@ export function _findMany(adapter, store, modelName, ids, internalModels) {
   );
 }
 
+function ensureInverseRelationshipDataOnHasManyResponse(
+  store,
+  payload,
+  leftHandSideRelationshipModel,
+  relationship
+) {
+  const { modelName: parentModelName, id: parentModelID } = leftHandSideRelationshipModel;
+  if (payload.data.length === 0) {
+    return payload;
+  }
+
+  let info = store._relationshipsPayloads.getRelationshipInfo(
+    parentModelName,
+    relationship.meta.name
+  );
+
+  let parentRelationshipInfo = {
+    data: {
+      id: parentModelID,
+      type: parentModelName,
+    },
+  };
+
+  if (info.hasInverse) {
+    payload.data.forEach(record => {
+      store._relationshipsPayloads.push(record.type, record.id, {
+        [info.rhs_relationshipName]: parentRelationshipInfo,
+      });
+    });
+  }
+
+  return payload;
+}
+
+// TODO: should we modify the payload or use the store._relationshipsPayload manager?
+function ensureInverseRelationshipDataOnBelongsToResponse(
+  store,
+  payload,
+  leftHandSideRelationshipModel,
+  relationship
+) {
+  const { modelName: parentModelName, id: parentModelID } = leftHandSideRelationshipModel;
+
+  let info = store._relationshipsPayloads.getRelationshipInfo(
+    parentModelName,
+    relationship.meta.name
+  );
+
+  let parentRelationshipInfo = {
+    data: {
+      id: parentModelID,
+      type: parentModelName,
+    },
+  };
+
+  if (info.hasInverse) {
+    store._relationshipsPayloads.push(payload.data.type, payload.data.id, {
+      [info.rhs_relationshipName]: parentRelationshipInfo,
+    });
+  }
+
+  return payload;
+}
+
 export function _findHasMany(adapter, store, internalModel, link, relationship) {
   let snapshot = internalModel.createSnapshot();
   let modelClass = store.modelFor(relationship.type);
@@ -131,6 +195,14 @@ export function _findHasMany(adapter, store, internalModel, link, relationship) 
         null,
         'findHasMany'
       );
+
+      payload = ensureInverseRelationshipDataOnHasManyResponse(
+        store,
+        payload,
+        internalModel,
+        relationship
+      );
+
       let internalModelArray = store._push(payload);
 
       internalModelArray.meta = payload.meta;
@@ -167,6 +239,13 @@ export function _findBelongsTo(adapter, store, internalModel, link, relationship
       if (!payload.data) {
         return null;
       }
+
+      payload = ensureInverseRelationshipDataOnBelongsToResponse(
+        store,
+        payload,
+        internalModel,
+        relationship
+      );
 
       return store._push(payload);
     },
